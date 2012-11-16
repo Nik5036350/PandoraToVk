@@ -1,4 +1,10 @@
-function Song (songName, bandName) {
+/*jslint browser: true*/
+/*global console */
+/*global $ */
+
+
+function Song(songName, bandName) {
+	'use strict';
 	this.bandName = bandName;
 	this.songName = songName;
 }
@@ -8,34 +14,37 @@ Song.FalseCounter = 0;
 Song.SongsObj = {};
 Song.SongsArray = [];
 
-Song.expandPandoraLikes = function(){
+Song.expandPandoraLikes = function () {
+	'use strict';
 	var buttonsLength = $(".show_more").length,
-		button = $(".show_more")[$(".show_more").length -1];
+		button = $(".show_more")[$(".show_more").length - 1];
 
-	if (Song.ButtonsCount != buttonsLength && button["style"]["cssText"].indexOf("display: none") == -1) {
+	if (Song.ButtonsCount != buttonsLength && button.style.cssText.indexOf("display: none") == -1) {
 		console.log("current - " + buttonsLength);
 		Song.ButtonsCount = buttonsLength;
 		$(button).click();
 		Song.FalseCounter = 1;
 	}
 
-	Song.FalseCounter--;
+	Song.FalseCounter = Song.FalseCounter - 1;
 
-	if(Song.FalseCounter < -10){
+	if (Song.FalseCounter < -10) {
 		Song.fillSongs();
 		return;
 	}
+
 	console.log("call again!!!");
 	setTimeout(Song.expandPandoraLikes, 200);
 };
 
-Song.fillSongs = function(){ 
+Song.fillSongs = function () { 
+	'use strict';
 	var songsBoxes = $("#songs .bi-col-left");
 
-	$.each(songsBoxes, function(key, value){
-		var songName = $(value).find("a")[0].innerText;
-		var bandName = $(value).find("a")[1].innerText;
-		var song = new Song(songName, bandName);
+	$.each(songsBoxes, function (key, value) {
+		var songName = $(value).find("a")[0].innerText,
+			bandName = $(value).find("a")[1].innerText,
+			song = new Song(songName, bandName);
 		console.log($.inArray(song, Song.SongsObj));
 		Song.SongsObj[song.getSeparatedStringName()] = key; 
 	});
@@ -43,8 +52,10 @@ Song.fillSongs = function(){
 	console.log(Object.keys(Song.SongsObj).length);
 };
 
-Song.fillSongsFromJson = function(jsonObj){
-	for (var i = 0; i < Object.keys(jsonObj).length; i++) {
+Song.fillSongsFromJson = function (jsonObj) {
+	'use strict';
+	var i = 0;
+	for (;i < Object.keys(jsonObj).length; i = i + 1) {
 		var tmpArray = Object.keys(jsonObj)[i].split("<*_*>");
 		Song.SongsArray.push(new Song(tmpArray[1], tmpArray[0]));
 		Song.SongsArray[i].getSeparatedStringName();
@@ -76,7 +87,7 @@ Song.prototype.searchInVk = function(){
 	    Song.songIsExist();
 	});
 
-};
+};sdf
 
 // Song.SongsObj.tryToAdd = function(){
 // 	for (var i = 0; i < Object.keys(Song.SongsObj).length; i++) {
