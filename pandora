@@ -1,0 +1,96 @@
+function Song (songName, bandName) {
+	this.bandName = bandName;
+	this.songName = songName;
+}
+
+Song.ButtonsCount = 0;
+Song.FalseCounter = 0;
+Song.SongsObj = {};
+Song.SongsArray = [];
+
+Song.expandPandoraLikes = function(){
+	var buttonsLength = $(".show_more").length,
+		button = $(".show_more")[$(".show_more").length -1];
+
+	if (Song.ButtonsCount != buttonsLength && button["style"]["cssText"].indexOf("display: none") == -1) {
+		console.log("current - " + buttonsLength);
+		Song.ButtonsCount = buttonsLength;
+		$(button).click();
+		Song.FalseCounter = 1;
+	}
+
+	Song.FalseCounter--;
+
+	if(Song.FalseCounter < -10){
+		Song.fillSongs();
+		return;
+	}
+	console.log("call again!!!");
+	setTimeout(Song.expandPandoraLikes, 200);
+};
+
+Song.fillSongs = function(){ 
+	var songsBoxes = $("#songs .bi-col-left");
+
+	$.each(songsBoxes, function(key, value){
+		var songName = $(value).find("a")[0].innerText;
+		var bandName = $(value).find("a")[1].innerText;
+		var song = new Song(songName, bandName);
+		console.log($.inArray(song, Song.SongsObj));
+		Song.SongsObj[song.getSeparatedStringName()] = key; 
+	});
+	console.log(JSON.stringify(Song.SongsObj, null, 2));
+	console.log(Object.keys(Song.SongsObj).length);
+};
+
+Song.fillSongsFromJson = function(jsonObj){
+	for (var i = 0; i < Object.keys(jsonObj).length; i++) {
+		var tmpArray = Object.keys(jsonObj)[i].split("<*_*>");
+		Song.SongsArray.push(new Song(tmpArray[1], tmpArray[0]));
+		Song.SongsArray[i].getSeparatedStringName();
+	}
+};
+
+Song.songIsExist = function() {
+	console.log(document.getElementById("initial_list").innerHTML);
+	return document.getElementById("initial_list").innerHTML == "";
+}
+ 
+//Перенести это в дочерний объект VkSong которого пока нет ))
+Song.prototype.getSeparatedStringName = function() {
+	return this.bandName + " <*_*> " + this.songName;
+};
+
+Song.prototype.getVkName = function() {
+	return this.bandName + " - " + this.songName;
+};
+
+Song.prototype.searchInVk = function(){
+	console.log("aaa - " + this.getVkName());
+	document.getElementsByClassName("s_search")[0].value = this.getVkName();
+	document.getElementsByClassName("s_search")[0].onpaste();
+
+	var container = document.getElementById("audios_list");
+	container.addEventListener( "DOMNodeRemoved", function() {
+	    console.log('Dom changed');
+	    Song.songIsExist();
+	});
+
+};
+
+// Song.SongsObj.tryToAdd = function(){
+// 	for (var i = 0; i < Object.keys(Song.SongsObj).length; i++) {
+// 			console.log(Object.keys(Song.SongsObj)[i]);
+// 			(function(){
+// 			var tmp = i; 
+// 			setTimeout( function(){
+// 				Song.SongsObj.searchInVk(Object.keys(Song.SongsObj)[tmp])
+// 			}, 2000)
+// 		}
+// 	})()
+// }
+
+//Song.expandPandoraLikes();
+
+// document.getElementsByClassName("s_search")[0].value = "65daysofstatic - Goodbye"
+// document.getElementById("audio_search").getElementsByTagName("button")[0].click()
